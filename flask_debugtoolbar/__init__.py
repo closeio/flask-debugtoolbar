@@ -1,4 +1,5 @@
 import os
+import re
 
 from flask import current_app, request, g
 from flask.globals import _request_ctx_stack
@@ -57,6 +58,9 @@ class DebugToolbarExtension(object):
 
         self.hosts = app.config.get('DEBUG_TB_HOSTS', ())
 
+        self.exclude_path = bool(app.config.get('DEBUG_TB_EXCLUDE_PATH_PATTERN', False))
+        self.exclude_path_pattern = re.compile(app.config.get('DEBUG_TB_EXCLUDE_PATH_PATTERN', ''))
+
         self.app.before_request(self.process_request)
         self.app.after_request(self.process_response)
         self.app.teardown_request(self.teardown_request)
@@ -108,6 +112,9 @@ class DebugToolbarExtension(object):
         if self.hosts and request.remote_addr not in self.hosts:
             return False
 
+        if self.exclude_path:
+            return not self.exclude_path_pattern.match(request.path)
+    
         return True
 
     def send_static_file(self, filename):
