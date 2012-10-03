@@ -1,4 +1,5 @@
 import os
+import re
 import warnings
 
 from flask import Blueprint, current_app, request, g, send_from_directory
@@ -71,6 +72,9 @@ class DebugToolbarExtension(object):
 
         DebugToolbar.load_panels(app)
 
+        self.exclude_path = bool(app.config.get('DEBUG_TB_EXCLUDE_PATH_PATTERN', False))
+        self.exclude_path_pattern = re.compile(app.config.get('DEBUG_TB_EXCLUDE_PATH_PATTERN', ''))
+
         app.before_request(self.process_request)
         app.after_request(self.process_response)
         app.teardown_request(self.teardown_request)
@@ -132,6 +136,9 @@ class DebugToolbarExtension(object):
         hosts = current_app.config['DEBUG_TB_HOSTS']
         if hosts and request.remote_addr not in hosts:
             return False
+
+        if self.exclude_path:
+            return not self.exclude_path_pattern.match(request.path)
 
         return True
 
