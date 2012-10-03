@@ -65,6 +65,9 @@ class DebugToolbarExtension(object):
         if not app.config['DEBUG_TB_ENABLED']:
             return
 
+        if app.testing:
+            return
+
         if not app.config.get('SECRET_KEY'):
             raise RuntimeError(
                 "The Flask-DebugToolbar requires the 'SECRET_KEY' config "
