@@ -50,6 +50,9 @@ class DebugToolbar(object):
             panel_class = getattr(mod, panel_classname)
             cls.panel_classes.append(panel_class)
 
+    def get_panel_classes(self):
+        return self.panel_classes
+
     def create_panels(self):
         """
         Populate debug panels
@@ -57,7 +60,7 @@ class DebugToolbar(object):
         activated = self.request.cookies.get('fldt_active', '')
         activated = urllib.unquote(activated).split(';')
 
-        for panel_class in self.panel_classes:
+        for panel_class in self.get_panel_classes():
             panel_instance = panel_class(
                 context=self.template_context,
                 jinja_env=self.jinja_env)
