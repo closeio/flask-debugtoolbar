@@ -41,6 +41,8 @@ class DebugToolbarExtension(object):
 
     _redirect_codes = [301, 302, 303, 304]
 
+    debug_toolbar_class = DebugToolbar
+
     def __init__(self, app=None):
         self.app = app
         self.debug_toolbars = {}
@@ -69,7 +71,7 @@ class DebugToolbarExtension(object):
                 "The Flask-DebugToolbar requires the 'SECRET_KEY' config "
                 "var to be set")
 
-        DebugToolbar.load_panels(app)
+        self.debug_toolbar_class.load_panels(app)
 
         app.before_request(self.process_request)
         app.after_request(self.process_response)
@@ -146,10 +148,9 @@ class DebugToolbarExtension(object):
             return
 
         real_request = request._get_current_object()
-
-        self.debug_toolbars[real_request] = (
-            DebugToolbar(real_request, self.jinja_env))
-
+        self.debug_toolbars[real_request] = self.debug_toolbar_class(
+            real_request, self.jinja_env
+        )
         for panel in self.debug_toolbars[real_request].panels:
             panel.process_request(real_request)
 
