@@ -1,3 +1,4 @@
+import socket
 import urllib
 
 from flask import url_for, current_app
@@ -29,7 +30,8 @@ class DebugToolbar(object):
         self.panels = []
 
         self.template_context = {
-            'static_path': url_for('_debug_toolbar.static', filename='')
+            'static_path': url_for('_debug_toolbar.static', filename=''),
+            'hostname': socket.gethostname(),
         }
 
         self.create_panels()
